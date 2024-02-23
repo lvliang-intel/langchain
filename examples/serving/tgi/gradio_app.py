@@ -52,7 +52,6 @@ llm = HuggingFaceEndpoint(
     temperature=0.01,
     repetition_penalty=1.03,
     streaming=True,
-    callbacks=callbacks
 )
 
 embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-base-en-v1.5")
@@ -268,19 +267,10 @@ def post_process_code(code):
         code = sep.join(blocks)
     return code
 
-def huggingface_api_stream_iter(
-    prompt,
-    temperature,
-    top_p,
-    repetition_penalty,
-    max_new_tokens
-):
-    text = ""
-
-    for token in retrievalQA({"query": prompt}):
-        text += " " + token
+def generator(question):
+    for text in retrievalQA.stream(question):
         data = {
-            "text": text.strip(),
+            "text": text['result'].strip(),
             "error_code": 0,
         }
         yield data
@@ -323,16 +313,8 @@ def http_bot(state, model_selector, temperature, max_new_tokens, topk, request: 
     state.messages[-1][-1] = "▌"
     yield (state, state.to_gradio_chatbot()) + (disable_btn,) * 5
 
-    # Stream output
-    stream_iter = huggingface_api_stream_iter(prompt=prompt,
-                                    temperature=temperature,
-                                    top_p=0.95,
-                                    repetition_penalty = 1.0,
-                                    max_new_tokens = max_new_tokens,
-                                    )
-
     try:
-        for i, data in enumerate(stream_iter):
+        for i, data in enumerate(generator(prompt)):
             if data["error_code"] == 0:
                 output = data["text"].strip()
                 state.messages[-1][-1] = output + "▌"
@@ -452,24 +434,12 @@ gradio-app {
     right: 0;
     width: 60px;
     height: 60px;
-    background-image: url(https://i.postimg.cc/gJzQTQPd/Microsoft-Teams-image-73.png);
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-}
-
-#chatbot::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 60px;
-    width: 60px;
-    height: 60px;
     background-image: url(https://i.postimg.cc/QCBQ45b4/Microsoft-Teams-image-44.png);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
 }
+
 
 #chatbot .wrap {
     margin-top: 30px !important;

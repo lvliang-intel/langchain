@@ -32,7 +32,7 @@ For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TO
 Send a request to check if the endpoint is wokring:
 
 ```bash
-curl localhost:8080/generate   -X POST   -d '{"inputs":"Which NFL team won the Super Bowl in the 2010 season?","parameters":{"max_new_tokens":128, "do_sample": true}}'   -H 'Content-Type: application/json'
+curl localhost:8080/generate -X POST -d '{"inputs":"Which NFL team won the Super Bowl in the 2010 season?","parameters":{"max_new_tokens":128, "do_sample": true}}'   -H 'Content-Type: application/json'
 ```
 The first call will be slower as the model is compiled.
 
@@ -40,6 +40,18 @@ More details please refer to [tgi-gaudi](https://github.com/huggingface/tgi-gaud
 
 For more information and documentation about Text Generation Inference, checkout the [README](https://github.com/huggingface/text-generation-inference#text-generation-inference) of the original repo.
 
+## Setup Conda
+
+First, you need to install and configure the Conda environment:
+
+```shell
+# Download and install Miniconda
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda*.sh
+source ~/.bashrc
+conda create -n langchain python=3.9.0
+conda activate langchain
+```
 
 ## Install Intel langchain extension
 
@@ -48,18 +60,22 @@ We provide a comprehensive suite of Langchain-based extension APIs, including ad
 git clone https://github.com/lvliang-intel/intel_genai_kit_langchain.git
 cd intel_genai_kit_langchain/libs/langchain/
 pip install -e .
+cd ../core/
+pip install -e .
+cd ../community/
+pip install -e .
 ```
 
 ## Install Other Dependencies
 
-To install the additional dependencies required for the project, use the following command:
+To install the additional dependencies required for this example, use the following command:
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Access Service
 
-To interact with the TGI endpoint and perform Large Language Model (LLM) inference, use the following commands:
+To interact with the TGI endpoint and perform the inference, use the following commands:
 
 ```bash
 cd ../examples/serving/tgi/
@@ -90,6 +106,6 @@ This command starts the Gradio application, providing a URL for interacting with
 
 ## Chat in the UI
 
-Open the URL generated after launching the Gradio application, and you can start interacting with the chat UI.
+Open the URL generated after launching the Gradio application, and you can start interacting with the chat UI now.
 
-![Frontend UI](https://i.imgur.com/O0QWEsS.png)
+![Frontend UI](https://i.imgur.com/yEiFXsR.png)
