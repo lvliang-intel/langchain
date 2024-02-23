@@ -81,6 +81,7 @@ class Qdrant(VectorStore):
             collection_name = "MyCollection"
             qdrant = Qdrant(client, collection_name, embedding_function)
     """
+    _LANGCHAIN_DEFAULT_COLLECTION_NAME = "langchain"
 
     CONTENT_KEY = "page_content"
     METADATA_KEY = "metadata"

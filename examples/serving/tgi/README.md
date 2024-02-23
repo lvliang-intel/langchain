@@ -60,6 +60,10 @@ We provide a comprehensive suite of Langchain-based extension APIs, including ad
 git clone https://github.com/lvliang-intel/intel_genai_kit_langchain.git
 cd intel_genai_kit_langchain/libs/langchain/
 pip install -e .
+cd ../core/
+pip install -e .
+cd ../community/
+pip install -e .
 ```
 
 ## Install Other Dependencies
