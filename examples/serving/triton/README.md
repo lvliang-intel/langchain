@@ -117,4 +117,19 @@ Then you will receive the following response:
     "request_id": "111"
 }
 ```
-Note that since Triton does not specifically serve for LLM inference, it does not implement the function of streamingly LLM inference with HTTP APIs. So we only suppor the non-stream mode of model inferencing here.
+
+## Known Issues
+### 1. CORS Issue
+Triton does not support HTTP endpoinst for `CORS policy` now. And there is an enhancement for CORS waiting for completion.
+
+Links:
+- https://github.com/triton-inference-server/server/issues/1147
+- https://github.com/triton-inference-server/server/issues/5971
+
+### 2. Streaming Issue
+Since Triton does not specifically serve for LLM inference, it does not implement the function of streamingly LLM inference with `HTTP APIs`. So you can only use the non-stream mode of model inferencing with triton, or generate streaming response with gRPC protocol.
+
+Links:
+- https://github.com/triton-inference-server/server/blob/main/docs/protocol/extension_generate.md
+- https://github.com/triton-inference-server/server/issues/6485
+
