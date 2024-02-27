@@ -29,6 +29,18 @@ docker run -p 8080:80 -v $volume:/data --runtime=habana -e HABANA_VISIBLE_DEVICE
 
 For gated models such as `LLAMA-2`, you will have to pass -e HUGGING_FACE_HUB_TOKEN=\<token\> to the docker run command above with a valid Hugging Face Hub read token.
 
+Please follow this link [huggingface token](https://huggingface.co/docs/hub/security-tokens) to get the access tokens.
+
+
+## Launch a local server instance on 8 Gaudi cards:
+
+```bash
+model=Intel/neural-chat-7b-v3-3
+volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
+
+docker run -p 8080:80 -v $volume:/data --runtime=habana -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none --cap-add=sys_nice --ipc=host tgi_gaudi --model-id $model --sharded true --num-shard 8
+```
+
 Send a request to check if the endpoint is wokring:
 
 ```bash
