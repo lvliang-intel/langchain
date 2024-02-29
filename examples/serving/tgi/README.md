@@ -83,8 +83,6 @@ pip install -e .
 To install the additional dependencies required for this example, use the following command:
 ```bash
 pip install -r requirements.txt
-pip install unstructured[pdf]
-pip install redis
 ```
 
 ## Configure Parameters
