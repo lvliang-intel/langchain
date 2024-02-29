@@ -83,7 +83,20 @@ pip install -e .
 To install the additional dependencies required for this example, use the following command:
 ```bash
 pip install -r requirements.txt
+pip install unstructured[pdf]
+pip install redis
 ```
+
+## Configure Parameters
+Before launching and consuming tgi-rag service, you need to configure parameters in `config.py` first.
+
+|Parameter|Type|Default Value|Help|
+|:--------| :---------:|:--------:|:--------|
+|REDIS_HOST|str|"localhost"|The Redis host IP|
+|REDIS_PORT|int|6379|The Redis Port|
+|GRADIO_ENTRYPOINT|str|"http://localhost:8080"|The entrypoint of TGI|
+|GRADIO_HOST|str|"0.0.0.0"|The Gradio host IP|
+|GRADIO_PORT|int|80|The Gradio port|
 
 ## Access Service
 
@@ -99,19 +112,19 @@ Ensure that the Hugging Face Hub API token is properly set for authentication.
 
 ## Create Embedding Database
 
-To generate the embedding database, use the following command:
+To generate the embedding database, use the following command. We support two different vector db: Chroma and Redis. Choose one for the parameter, Chroma will be chosen defaultly.
 ```bash
-python vectordb.py
+python vectordb.py --db Redis
 ```
 
 This command creates the embedding database for a PDF file 'Intel_AR_WR.pdf'. The Gradio application utilizes this pre-built embedding database to build langchain application. Ensure that the embedding database is generated before starting the Gradio frontend application.
 
 ## Start the frontend
 
-To initiate the frontend, follow these steps:
+To initiate the frontend, follow these steps. Same as vectordb.py, you need to choose a vector db and pass into the python file. Chroma will be chosen defaultly.
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<token>
-python gradio_app.py
+python gradio_app.py --db Redis
 ```
 
 This command starts the Gradio application, providing a URL for interacting with the chat UI.
