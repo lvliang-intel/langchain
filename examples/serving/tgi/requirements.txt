@@ -19,4 +19,5 @@ langid
 beautifulsoup4
 InstructorEmbedding
 qdrant-client
-unstructured
+unstructured[pdf]
+redis
