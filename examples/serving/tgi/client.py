@@ -1,6 +1,7 @@
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain import LLMChain
 from langchain import PromptTemplate
+from config import GRADIO_ENTRYPOINT
 
 multi_template = """Answer the following questions one at a time.
 
@@ -12,9 +13,8 @@ Answers:
 long_prompt = PromptTemplate(template=multi_template, input_variables=["questions"])
 
 
-ENDPOINT_URL = "http://localhost:8080"
 llm = HuggingFaceEndpoint(
-    endpoint_url=ENDPOINT_URL,
+    endpoint_url=GRADIO_ENTRYPOINT,
     max_new_tokens=512,
     top_k=10,
     top_p=0.95,

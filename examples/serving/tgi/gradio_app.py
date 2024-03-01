@@ -19,6 +19,7 @@ import datetime
 import json
 import os
 import time
+import argparse
 
 import gradio as gr
 import requests
@@ -30,21 +31,30 @@ from fastchat.constants import LOGDIR
 from fastchat.utils import (
     build_logger,
 )
-
-
 from langchain_community.llms import HuggingFaceEndpoint
-from langchain.callbacks import streaming_stdout
+from langchain_community.vectorstores import Redis
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain_core.vectorstores import VectorStoreRetriever
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.pydantic_v1 import BaseModel
 from intel_extension_for_transformers.langchain.embeddings import HuggingFaceBgeEmbeddings
 from intel_extension_for_transformers.langchain.vectorstores import Chroma
 import torch
 import intel_extension_for_pytorch as ipex
+from config import REDIS_SCHEMA, REDIS_URL, INDEX_NAME, GRADIO_HOST, GRADIO_ENTRYPOINT, GRADIO_PORT
 
-ENDPOINT_URL = "http://localhost:8080"
-callbacks = [streaming_stdout.StreamingStdOutCallbackHandler()]
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--db', type=str, default="chroma", help='The vector db you choose, must be in [chroma, redis].')
+args = parser.parse_args()
+print(f"args: {args}")
+
+# Define LLM
 llm = HuggingFaceEndpoint(
-    endpoint_url=ENDPOINT_URL,
+    endpoint_url=GRADIO_ENTRYPOINT,
     max_new_tokens=512,
     top_k=10,
     top_p=0.95,
@@ -53,13 +63,57 @@ llm = HuggingFaceEndpoint(
     repetition_penalty=1.03,
     streaming=True,
 )
+llm_chain = None
 
-embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-base-en-v1.5")
-embeddings.client= ipex.optimize(embeddings.client.eval(), dtype=torch.bfloat16)
-knowledge_base = Chroma.reload(persist_directory='./output', embedding=embeddings)
+if args.db.lower() == "chroma":
+    embeddings = HuggingFaceBgeEmbeddings(model_name="BAAI/bge-base-en-v1.5")
+    embeddings.client= ipex.optimize(embeddings.client.eval(), dtype=torch.bfloat16)
+    knowledge_base = Chroma.reload(persist_directory='./output', embedding=embeddings)
 
-retriever = VectorStoreRetriever(vectorstore=knowledge_base, search_type='mmr', search_kwargs={'k':1, 'fetch_k':5})
-retrievalQA = RetrievalQA.from_llm(llm=llm, retriever=retriever)
+    retriever = VectorStoreRetriever(vectorstore=knowledge_base, search_type='mmr', search_kwargs={'k':1, 'fetch_k':5})
+    llm_chain = RetrievalQA.from_llm(llm=llm, retriever=retriever)
+
+elif args.db.lower() == "redis":
+    EMBED_MODEL = os.getenv("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+    embeddings = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
+    rds = Redis.from_existing_index(
+        embeddings,
+        index_name=INDEX_NAME,
+        redis_url=REDIS_URL,
+        schema=REDIS_SCHEMA,
+    )
+    retriever = rds.as_retriever(search_type="similarity", search_kwargs={"k": 4})
+
+    class Question(BaseModel):
+        __root__: str
+
+    template = """
+        Use the following pieces of context from retrieved
+        dataset to answer the question. Do not make up an answer if there is no
+        context provided to help answer it. Include the 'source' and 'start_index'
+        from the metadata included in the context you used to answer the question
+
+        Context:
+        ---------
+        {context}
+
+        ---------
+        Question: {question}
+        ---------
+
+        Answer:
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+
+    llm_chain = (
+        RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
+        | prompt
+        | llm
+        | StrOutputParser()
+    ).with_types(input_type=Question)
+
+else:
+    raise Exception("Unexpected vector db. Must be one of [Chroma, Redis].")
 
 
 code_highlight_css = """
@@ -268,9 +322,9 @@ def post_process_code(code):
     return code
 
 def generator(question):
-    for text in retrievalQA.stream(question):
+    for text in llm_chain.stream(question):
         data = {
-            "text": text['result'].strip(),
+            "text": text['result'].strip() if args.db.lower() == "chroma" else text,
             "error_code": 0,
         }
         yield data
@@ -306,7 +360,7 @@ def http_bot(state, model_selector, temperature, max_new_tokens, topk, request: 
 
     # Construct prompt
     prompt = state.get_prompt()
-    # print("prompt==============", prompt)
+    print("prompt==============", prompt)
 
     start_time = time.time()
 
@@ -316,8 +370,12 @@ def http_bot(state, model_selector, temperature, max_new_tokens, topk, request: 
     try:
         for i, data in enumerate(generator(prompt)):
             if data["error_code"] == 0:
-                output = data["text"].strip()
-                state.messages[-1][-1] = output + "▌"
+                if args.db.lower() == "chroma":
+                    output = data["text"].strip()
+                    state.messages[-1][-1] = output + "▌"
+                else:
+                    output = data["text"]
+                    state.messages[-1][-1] = state.messages[-1][-1][:-1] + output + "▌"
                 yield (state, state.to_gradio_chatbot()) + (disable_btn,) * 5
             else:
                 output = data["text"] + f"\n\n(error_code: {data['error_code']})"
@@ -705,16 +763,12 @@ def build_demo(models):
 
 
 if __name__ == "__main__":
-    host = "0.0.0.0"
-
-    concurrency_count = 10
     model_list_mode = "once"
-    share = False
-
     models = ["Intel/neural-chat-7b-v3-3"]
+
     demo = build_demo(models)
     demo.queue(
-        concurrency_count=concurrency_count, status_update_rate=10, api_open=False
+        concurrency_count=10, status_update_rate=10, api_open=False
     ).launch(
-        server_name=host, server_port=80, share=share, max_threads=200
+        server_name=GRADIO_HOST, server_port=GRADIO_PORT, share=False, max_threads=200
     )
