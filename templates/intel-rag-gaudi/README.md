@@ -1,4 +1,4 @@
-# Intel Optimized RAG on Gaudi
+# RAG Example on Intel Gaudi
 This template performs RAG using Chroma and Text Generation Inference on Habana Gaudi2. The Intel Gaudi 2 accelerator supports both training and inference for deep learning models in particular for LLMs. Please visit [Habana AI products](https://habana.ai/products) for more details.
 
 ## Environment Setup
