@@ -37,7 +37,7 @@ def ingest_documents():
         documents=documents,
         collection_name="gaudio-rag",
         embedding=embedder,
-        persist_directory='./gaudi_rag_db'
+        persist_directory='/tmp/gaudi_rag_db'
     )
 
 

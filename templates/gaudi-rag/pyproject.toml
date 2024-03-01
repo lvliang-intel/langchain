@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "gaudi-rag"
 version = "0.0.1"
-description = "Run a RAG app backed by Habana Gaudi"
+description = "Run a RAG app on Intel Gaudi Accelerator"
 authors = [
     "Liang Lv <liang1.lv@intel.com>",
 ]

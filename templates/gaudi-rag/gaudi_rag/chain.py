@@ -10,10 +10,13 @@ from langchain_community.vectorstores import Chroma
 
 embedder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-knowledge_base = Chroma(persist_directory='./gaudi_rag_db', embedding_function=embedder)
-
+knowledge_base = Chroma(persist_directory='/tmp/gaudi_rag_db',
+                        embedding_function=embedder,
+                        collection_name="gaudio-rag")
+query = "What was Nike's revenue in 2023?"
+docs = knowledge_base.similarity_search(query)
+print(docs[0].page_content)
 retriever = VectorStoreRetriever(vectorstore=knowledge_base, search_type='mmr', search_kwargs={'k':1, 'fetch_k':5})
-
 
 # Make this look better in the docs.
 class Question(BaseModel):
