@@ -1,10 +1,11 @@
 import os
 
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 
 def ingest_documents():
     """
