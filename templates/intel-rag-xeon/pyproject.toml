@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "xeon-rag"
+name = "intel-rag-xeon"
 version = "0.0.1"
 description = "Run a RAG app on Intel Xeon Scalable Processors"
 authors = [
@@ -28,7 +28,7 @@ poethepoet = "^0.24.1"
 langchain-cli = ">=0.0.21"
 
 [tool.langserve]
-export_module = "xeon_rag.chain"
+export_module = "intel_rag_xeon.chain"
 export_attr = "chain"
 
 [tool.templates-hub]

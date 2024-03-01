@@ -1,4 +1,4 @@
-# Xeon RAG
+# RAG example on Intel Xeon
 This template performs RAG using Chroma and Text Generation Inference on Intel® Xeon® Scalable Processors.
 Intel® Xeon® Scalable processors feature built-in accelerators for more performance-per-core and unmatched AI performance, with advanced security technologies for the most in-demand workload requirements—all while offering the greatest cloud choice and application portability, please check [Intel® Xeon® Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon/scalable.html).
 
@@ -52,20 +52,20 @@ pip install -U langchain-cli
 To create a new LangChain project and install this as the only package, you can do:
 
 ```shell
-langchain app new my-app --package xeon-rag
+langchain app new my-app --package intel-rag-xeon
 ```
 
 If you want to add this to an existing project, you can just run:
 
 ```shell
-langchain app add xeon-rag
+langchain app add intel-rag-xeon
 ```
 
 And add the following code to your `server.py` file:
 ```python
-from xeon_rag import chain as xeon_rag_chain
+from intel_rag_xeon import chain as xeon_rag_chain
 
-add_routes(app, xeon_rag_chain, path="/xeon-rag")
+add_routes(app, xeon_rag_chain, path="/intel-rag-xeon")
 ```
 
 (Optional) Let's now configure LangSmith. LangSmith will help us trace, monitor and debug LangChain applications. LangSmith is currently in private beta, you can sign up [here](https://smith.langchain.com/). If you don't have access, you can skip this section
@@ -86,12 +86,12 @@ This will start the FastAPI app with a server is running locally at
 [http://localhost:8000](http://localhost:8000)
 
 We can see all templates at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-We can access the playground at [http://127.0.0.1:8000/xeon-rag/playground](http://127.0.0.1:8000/xeon-rag/playground)
+We can access the playground at [http://127.0.0.1:8000/intel-rag-xeon/playground](http://127.0.0.1:8000/intel-rag-xeon/playground)
 
 We can access the template from code with:
 
 ```python
 from langserve.client import RemoteRunnable
 
-runnable = RemoteRunnable("http://localhost:8000/xeon-rag")
+runnable = RemoteRunnable("http://localhost:8000/intel-rag-xeon")
 ```
