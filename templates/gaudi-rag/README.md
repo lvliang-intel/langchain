@@ -55,7 +55,7 @@ poetry install
 poetry run python ingest.py
 ```
 
-The script process and stores sections from the 2022 Intel Annual Report `data/Intel_AR_WR.pdf` into a Chroma database.
+The script process and stores sections from Edgar 10k filings data for Nike `nke-10k-2023.pdf` into a Chroma database.
 
 ## Usage
 

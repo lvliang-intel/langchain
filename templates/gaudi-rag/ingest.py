@@ -8,13 +8,13 @@ from langchain_core.documents import Document
 
 def ingest_documents():
     """
-    Ingest PDF to Chroma from the data/ directory that contains Intel 2022 Annual Report.
+    Ingest PDF to Chroma from the data/ directory that contains Edgar 10k filings data for Nike.
     """
     # Load list of pdfs
     data_path = "data/"
     doc = [os.path.join(data_path, file) for file in os.listdir(data_path)][0]
 
-    print("Parsing Intel annual report", doc)
+    print("Parsing 10k filing doc for NIKE", doc)
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1500, chunk_overlap=100, add_start_index=True
