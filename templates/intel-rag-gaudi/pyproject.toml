@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gaudi-rag"
+name = "intel-rag-gaudi"
 version = "0.0.1"
 description = "Run a RAG app on Intel Gaudi Accelerator"
 authors = [
@@ -28,7 +28,7 @@ poethepoet = "^0.24.1"
 langchain-cli = ">=0.0.21"
 
 [tool.langserve]
-export_module = "gaudi_rag.chain"
+export_module = "intel_rag_gaudi.chain"
 export_attr = "chain"
 
 [tool.templates-hub]

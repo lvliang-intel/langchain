@@ -68,20 +68,20 @@ pip install -U langchain-cli
 To create a new LangChain project and install this as the only package, you can do:
 
 ```shell
-langchain app new my-app --package gaudi-rag
+langchain app new my-app --package intel-rag-gaudi
 ```
 
 If you want to add this to an existing project, you can just run:
 
 ```shell
-langchain app add gaudi-rag
+langchain app add intel-rag-gaudi
 ```
 
 And add the following code to your `server.py` file:
 ```python
-from gaudi_rag import chain as gaudi_rag_chain
+from intel_rag_gaudi import chain as gaudi_rag_chain
 
-add_routes(app, gaudi_rag_chain, path="/gaudi-rag")
+add_routes(app, gaudi_rag_chain, path="/intel-rag-gaudi")
 ```
 
 (Optional) Let's now configure LangSmith. LangSmith will help us trace, monitor and debug LangChain applications. LangSmith is currently in private beta, you can sign up [here](https://smith.langchain.com/). If you don't have access, you can skip this section
@@ -102,13 +102,13 @@ This will start the FastAPI app with a server is running locally at
 [http://localhost:8000](http://localhost:8000)
 
 We can see all templates at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-We can access the playground at [http://127.0.0.1:8000/gaudi-rag/playground](http://127.0.0.1:8000/gaudi-rag/playground)
+We can access the playground at [http://127.0.0.1:8000/intel-rag-gaudi/playground](http://127.0.0.1:8000/intel-rag-gaudi/playground)
 
 We can access the template from code with:
 
 ```python
 from langserve.client import RemoteRunnable
 
-runnable = RemoteRunnable("http://localhost:8000/gaudi-rag")
+runnable = RemoteRunnable("http://localhost:8000/intel-rag-gaudi")
 ```
 
