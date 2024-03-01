@@ -8,7 +8,8 @@ from langchain_core.documents import Document
 
 def ingest_documents():
     """
-    Ingest PDF to Chroma from the data/ directory that contains Edgar 10k filings data for Nike.
+    Ingest PDF to Redis from the data/ directory that
+    contains Edgar 10k filings data for Nike.
     """
     # Load list of pdfs
     data_path = "data/"
@@ -25,7 +26,8 @@ def ingest_documents():
     print("Done preprocessing. Created", len(chunks), "chunks of the original pdf")
 
     # Create vectorstore
-    embedder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embedder = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     documents = []
     for chunk in chunks:

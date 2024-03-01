@@ -8,6 +8,14 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_community.vectorstores import Chroma
 
+
+
+# Make this look better in the docs.
+class Question(BaseModel):
+    __root__: str
+
+
+# Init Embeddings
 embedder = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 knowledge_base = Chroma(persist_directory='/tmp/gaudi_rag_db',
@@ -16,12 +24,9 @@ knowledge_base = Chroma(persist_directory='/tmp/gaudi_rag_db',
 query = "What was Nike's revenue in 2023?"
 docs = knowledge_base.similarity_search(query)
 print(docs[0].page_content)
-retriever = VectorStoreRetriever(vectorstore=knowledge_base, search_type='mmr', search_kwargs={'k':1, 'fetch_k':5})
-
-# Make this look better in the docs.
-class Question(BaseModel):
-    __root__: str
-
+retriever = VectorStoreRetriever(vectorstore=knowledge_base,
+                                 search_type='mmr',
+                                 search_kwargs={'k':1, 'fetch_k':5})
 
 # Define our prompt
 template = """
